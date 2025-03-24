@@ -1,3 +1,4 @@
+import os  # Añadimos esta importación
 from flask import Flask, request, redirect, render_template_string
 
 app = Flask(__name__)
@@ -93,15 +94,12 @@ def home():
         </html>
     """)
 
-# Ruta para acortar la URL
 @app.route('/shorten', methods=['POST'])
 def shorten_url():
     original_url = request.form['url']
     
-    # Aquí generamos una clave con el prefijo "out."
     short_code = 'out.' + str(len(url_db) + 1)
     
-    # Guardamos la URL original con la clave corta
     url_db[short_code] = original_url
     
     return render_template_string("""
@@ -203,6 +201,7 @@ def redirect_to_url(short_code):
     else:
         return 'URL no encontrada', 404
 
-# Inicia la aplicación en el puerto 5000
-if __name__ == '__main__':
-    app.run(debug=True)
+# Aquí es donde se inicia la aplicación con la configuración para Heroku
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))  # Heroku asigna el puerto a través de la variable de entorno 'PORT'
+    app.run(host='0.0.0.0', port=port, debug=True)
